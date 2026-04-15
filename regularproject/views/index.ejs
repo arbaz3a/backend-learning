@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div class="min-h-screen w-full bg-zinc-900">
+        <div class="text-white p-6">
+            <form action="/create-file" method="post">
+                <input class="px-2 py-2 mb-2 w-full outline-none block rounded-md bg-zinc-800" type="text" placeholder="enter your title here " name="title">
+                <textarea class="mb-3 px-2 py-2 w-full outline-none block rounded-md bg-zinc-800 resize-none" name="description" placeholder="write your file description here"></textarea>
+                <input class="bg-blue-600 py-1 cursor-pointer px-4 rounded-md" type="submit" value="Create File">
+            </form>
+        </div>
+        <div class="text-white p-6 flex gap-3 flex-wrap">
+            <% if(files.length > 0){ %>
+                <% files.forEach((val)=>{ %>
+                    <div class="bg-zinc-800 px-2 py-1 rounded-md min-w-72">
+                        <h1 class="text-white text-xl tracking-tighter"><%= val %></h1>
+                        <div class="text-blue-600 mt-2 text-sm flex justify-between items-center">
+                            <a href="/file/<%= val%>">Read More →</a>
+                            <a href="/edit/<%= val %>">Edit</a>
+                        </div>
+                    </div>
+                <% }) %>
+            <%} else{ %> 
+                <p class="text-white">No such file exist.</p>
+            <% } %>
+        </div>
+    </div>
+  </body>
+</html>

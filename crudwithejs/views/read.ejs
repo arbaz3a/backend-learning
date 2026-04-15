@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheet/style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="w-full h-full p-7 bg-zinc-900 text-white">
+      <h1 class="mb-8">All users</h1>
+      <div class="users flex gap-3 flex-wrap">
+
+        <% if(data.length>0){ %>
+          <% data.forEach((obj)=>{ %>
+            <div class="user w-40 p-2 bg-zinc-800 rounded-lg">
+              <div class="w-full h-40 rounded-lg bg-zinc-700">
+                <img class="w-full h-full object-cover" src="<%= obj.image%>" alt="<%= obj.name %>">
+              </div>
+              <h3 class="text-xl mt-3"><%= obj.name%></h3>
+              <h5 class="text-xs"><%= obj.email%></h5>
+              <div class="flex gap-6 mt-6">
+                <a href="/edit/<%= obj._id %>">Edit</a>
+                <a class="text-red-400" href="/delete/<%= obj._id%>">Delete</a>
+              </div>
+            </div>
+          <% }) %>
+          <% }else {%>
+            <p class="text-xl">No user found</p>
+          <% } %>
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div class="min-h-screen w-full bg-zinc-900 p-10 text-white">
+      <form action="/edit" method="post">
+        <input
+          class="px-2 py-2 mb-2 w-1/4 outline-none block rounded-md bg-zinc-800"
+          type="text"
+          placeholder="previous name"
+          name="previous"
+          value="<%= filename %>"
+        />
+        <input
+          class="px-2 py-2 mb-2 w-1/4 outline-none block rounded-md bg-zinc-800"
+          type="text"
+          placeholder="new name"
+          name="new"
+        />
+        
+        <input
+          class="bg-blue-600 py-1 cursor-pointer px-4 rounded-md"
+          type="submit"
+          value="Edit"
+        />
+      </form>
+    </div>
+  </body>
+</html>

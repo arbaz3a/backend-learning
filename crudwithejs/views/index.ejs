@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheet/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+    <div class="w-full h-full p-7 bg-zinc-800 text-white">
+        <div class="navbar mb-5">
+            <a class="text-red-500" href="/read">Read</a>
+        </div>
+        <h1 class="mb-4 text-2xl">Create</h1>
+        <form action="/create" method="post">
+            <input name="name" class="px-3 py-2 border-1 border-white-300 rounded-lg outline-none bg-transparent" type="text" placeholder="enter name">
+            <input name="email" class="px-3 py-2 outline-none bg-transparent border-1 border-white-300 rounded-lg" type="text" placeholder="enter email">
+            <input name="image" class="px-3 py-2 outline-none bg-transparent border-1 border-white-300 rounded-lg" type="text" placeholder="enter image url">
+            <input class="px-3 py-2 bg-blue-500 rounded-lg" type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
