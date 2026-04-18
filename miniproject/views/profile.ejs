@@ -33,7 +33,7 @@
         <div>
             <h2 class="text-xl mb-4">Your Posts</h2>
             <div class="flex flex-wrap gap-3">
-                <% user.posts.forEach((post)=>{ %>
+                <% user.posts.reverse().forEach((post)=>{ %>
                     <div class="w-full md:w-[32%] bg-zinc-800 p-3 rounded-lg shadow">
                         <h3 class="font-semibold mb-2 text-blue-500">
                             <%= user.name %>
@@ -46,7 +46,6 @@
                             <a href="#" class="text-zinc-400 hover:underline">Edit</a>
                         </div>
                     </div>
-
                 <% }) %>
         </div>
     </div>
