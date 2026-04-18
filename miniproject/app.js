@@ -16,7 +16,8 @@ app.use(cookieParser())
 //middleware
 const isLogged = (req, res, next)=>{
     if(!req.cookies.token){
-        return res.send("u must be logged in")
+        // console.log("u must be logged in")
+        res.redirect('/login')
     }
     try{
         let data = jwt.verify(req.cookies.token, 'secret')
@@ -32,10 +33,27 @@ app.get('/', (req, res)=>{
     res.render('index')
 })
 
-// protect route
-app.get('/profile', isLogged, (req, res)=>{
-    console.log(req.user)
-    res.send('hello')
+// protect routes
+app.get('/profile', isLogged, async (req, res)=>{
+    // console.log(req.user)
+    // let user = await userModel.findOne({_id: req.user.userid}) // find based on the id
+    let user = await userModel.findOne({email: req.user.email})
+    await user.populate('posts')
+    res.render('profile', {user})
+
+})
+
+app.post('/post', isLogged, async (req, res)=>{
+    let user = await userModel.findOne({email: req.user.email})
+    let {content} = req.body;
+    let createdpost = await postModel.create({
+        user: user._id,
+        content
+    })
+    user.posts.push(createdpost._id)
+    await user.save()
+    res.redirect("/profile")
+
 })
 
 app.post('/register', async (req, res)=>{
@@ -58,7 +76,8 @@ app.post('/register', async (req, res)=>{
     let token = jwt.sign({email: email, userid: createUser._id}, 'secret')
     res.cookie('token', token) // set cookie on browser
 
-    res.send(createUser)
+    res.redirect('/profile')
+    // res.send(createUser)
 })
 
 app.get('/logout', (req, res)=>{
@@ -79,7 +98,8 @@ app.post('/login-user',async (req, res)=>{
         //generate token
         let token = jwt.sign({email: find.email, userid: find._id}, 'secret') 
         res.cookie('token', token) // set cookie on browser
-        res.status(200).send('login successfully!')
+        // res.status(200).send('login successfully!')
+        res.redirect('/profile')
     } 
     else{
         res.send('email or password wrong')
