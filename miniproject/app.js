@@ -44,10 +44,29 @@ app.get('/profile', isLogged, async (req, res)=>{
     res.render('profile', {user})
 
 })
+
 app.get('/like/:id', isLogged, async (req, res)=>{
     let post = await postModel.findOne({_id: req.params.id})
-    post.likes.push(req.user.userid)
+    
+    if(post.likes.indexOf(req.user.userid) === -1){
+        post.likes.push(req.user.userid)
+    }
+    else{
+        let index = post.likes.indexOf(req.user.userid)
+        post.likes.splice(index, 1)
+    }
     await post.save()
+    res.redirect('/profile')
+})
+
+app.get('/edit/:id', isLogged, async (req, res)=>{
+    let post = await postModel.findOne({_id: req.params.id})
+    res.render('edit', {post})
+})
+
+app.post('/update/:id', isLogged, async (req, res)=>{
+    let {content} = req.body
+    let post = await postModel.findOneAndUpdate({_id: req.params.id}, {content: content})
     res.redirect('/profile')
 })
 

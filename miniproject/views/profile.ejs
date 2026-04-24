@@ -38,12 +38,15 @@
                         <h3 class="font-semibold mb-2 text-blue-500">
                             <%= user.name %>
                         </h3>
-                        <p class="text-zinc-300 mb-3">
+                        <p class="text-zinc-300 mb-2">
                             <%= post.content %>
                         </p>
+                        <p class="text-zinc-300 text-xs mb-2"><%= post.likes.length %> likes</p>
                         <div class="flex gap-4 text-sm">
-                            <a href="/like/<%= post._id %>" class="text-blue-400 hover:underline">Like</a>
-                            <a href="#" class="text-zinc-400 hover:underline">Edit</a>
+                            <a href="/like/<%= post._id %>" class="text-blue-400 hover:underline">
+                                <%= post.likes.indexOf(user._id) === -1 ? 'Like': "Unlike" %>
+                            </a>
+                            <a href="/edit/<%= post._id %>" class="text-zinc-400 hover:underline">Edit</a>
                         </div>
                     </div>
                 <% }) %>
