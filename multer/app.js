@@ -4,7 +4,10 @@ const path = require('path');
 
 const app = express();
 
+//view engine
 app.set('view engine', 'ejs');
+
+//middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static('public'))
@@ -30,7 +33,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.send('File uploaded successfully!');
 });
 
-// server
 app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+    console.log('Server running on 3000');
 });
