@@ -5,9 +5,7 @@ const userModel = require('./models/user')
 const postModel = require('./models/post')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-
-const multer = require('multer');
-const path = require('path');
+const multerConfig = require('./config/multer')
 
 app.set('view engine', 'ejs')
 
@@ -17,25 +15,14 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static('public'))
 app.use(cookieParser())
 
-// multer config
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/images/uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
 
-const upload = multer({ storage: storage });
+// app.get('/file', (req, res) => {
+//     res.render('fileindex');
+// });
 
-app.get('/file', (req, res) => {
-    res.render('fileindex');
-});
-
-app.post('/upload', upload.single('file'), (req, res) => {
-    res.send('File uploaded successfully!');
-});
+// app.post('/upload', upload.single('file'), (req, res) => {
+//     res.send('File uploaded successfully!');
+// });
 
 
 //middleware
