@@ -3,9 +3,8 @@ const app = express()
 const cookieParser = require('cookie-parser')
 const userModel = require('./models/user')
 const postModel = require('./models/post')
-const bcrypt = require('bcrypt')
+const upload = require('./config/multer')
 const jwt = require('jsonwebtoken')
-const multerConfig = require('./config/multer')
 
 app.set('view engine', 'ejs')
 
@@ -14,15 +13,6 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static('public'))
 app.use(cookieParser())
-
-
-// app.get('/file', (req, res) => {
-//     res.render('fileindex');
-// });
-
-// app.post('/upload', upload.single('file'), (req, res) => {
-//     res.send('File uploaded successfully!');
-// });
 
 
 //middleware
@@ -41,6 +31,20 @@ const isLogged = (req, res, next)=>{
         return res.send("invalid token")
     }
 }
+
+app.get('/profile/image', (req, res) => {
+    res.render('profileuploader');
+});
+
+app.post('/upload', isLogged, upload.single('image'), async (req, res) => {
+    // res.send('File uploaded successfully!');
+    // console.log(req.file)
+    let user = await userModel.findOne({email: req.user.email})
+    user.userprofile = req.file.filename
+    await user.save()
+    res.redirect('/profile')
+});
+
 
 // main router fisrt page
 app.get('/', (req, res)=>{
