@@ -101,6 +101,10 @@ app.post("/post", isLogged, async (req, res) => {
 // un-protected route
 app.post("/register", async (req, res) => {
   let { username, email, password, age, name } = req.body;
+  if (!username || !email || !password || !age || !name) {
+        return res.redirect('/')
+    }
+
   let userCheck = await userModel.findOne({ email });
   if (userCheck) return res.status(500).send("user already exist");
 
