@@ -5,6 +5,7 @@ const userModel = require('./models/user')
 const postModel = require('./models/post')
 const upload = require('./config/multer')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 app.set('view engine', 'ejs')
 
