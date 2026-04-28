@@ -1,158 +1,168 @@
-const express = require('express')
-const app = express()
-const cookieParser = require('cookie-parser')
-const userModel = require('./models/user')
-const postModel = require('./models/post')
-const upload = require('./config/multer')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+const express = require("express");
+const app = express();
+const cookieParser = require("cookie-parser");
+const userModel = require("./models/user");
+const postModel = require("./models/post");
+const upload = require("./config/multer");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
-app.set('view engine', 'ejs')
-
-//middleware
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-app.use(express.static('public'))
-app.use(cookieParser())
-
+app.set("view engine", "ejs");
 
 //middleware
-const isLogged = (req, res, next)=>{
-    if(!req.cookies.token){
-        // console.log("u must be logged in")
-        res.redirect('/login')
-    }
-    try{
-        let data = jwt.verify(req.cookies.token, 'secret')
-        // console.log(data)
-        req.user = data
-        next()
-    }
-    catch(err){
-        return res.send("invalid token")
-    }
-}
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+app.use(cookieParser());
 
-app.get('/profile/image', (req, res) => {
-    res.render('profileuploader');
+//middleware
+const isLogged = (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    const data = jwt.verify(token, "secret");
+    req.user = data;
+    return next();
+  } catch (err) {
+    res.clearCookie("token");
+    return res.redirect("/login");
+  }
+};
+app.get("/profile/image", (req, res) => {
+  res.render("profileuploader");
 });
 
-app.post('/upload', isLogged, upload.single('image'), async (req, res) => {
-    // res.send('File uploaded successfully!');
-    // console.log(req.file)
-    let user = await userModel.findOne({email: req.user.email})
-    user.userprofile = req.file.filename
-    await user.save()
-    res.redirect('/profile')
+app.post("/upload", isLogged, upload.single("image"), async (req, res) => {
+  // res.send('File uploaded successfully!');
+  // console.log(req.file)
+  let user = await userModel.findOne({ email: req.user.email });
+  user.userprofile = req.file.filename;
+  await user.save();
+  res.redirect("/profile");
 });
-
 
 // main router fisrt page
-app.get('/', (req, res)=>{
-    res.render('index')
-})
+app.get("/", (req, res) => {
+  res.render("index");
+});
 
 // protect routes
-app.get('/profile', isLogged, async (req, res)=>{
-    // console.log(req.user)
-    // let user = await userModel.findOne({_id: req.user.userid}) // find based on the id
-    let user = await userModel.findOne({email: req.user.email})
-    await user.populate('posts')
-    res.render('profile', {user})
+app.get("/profile", isLogged, async (req, res) => {
+  // console.log(req.user)
+  // let user = await userModel.findOne({_id: req.user.userid}) // find based on the id
+  let user = await userModel.findOne({ email: req.user.email });
+  await user.populate("posts");
+  res.render("profile", { user });
+});
 
-})
+app.get("/like/:id", isLogged, async (req, res) => {
+  let post = await postModel.findOne({ _id: req.params.id });
 
-app.get('/like/:id', isLogged, async (req, res)=>{
-    let post = await postModel.findOne({_id: req.params.id})
-    
-    if(post.likes.indexOf(req.user.userid) === -1){
-        post.likes.push(req.user.userid)
-    }
-    else{
-        let index = post.likes.indexOf(req.user.userid)
-        post.likes.splice(index, 1)
-    }
-    await post.save()
-    res.redirect('/profile')
-})
+  if (post.likes.indexOf(req.user.userid) === -1) {
+    post.likes.push(req.user.userid);
+  } else {
+    let index = post.likes.indexOf(req.user.userid);
+    post.likes.splice(index, 1);
+  }
+  await post.save();
+  res.redirect("/profile");
+});
 
-app.get('/edit/:id', isLogged, async (req, res)=>{
-    let post = await postModel.findOne({_id: req.params.id})
-    res.render('edit', {post})
-})
+app.get("/edit/:id", isLogged, async (req, res) => {
+  let post = await postModel.findOne({ _id: req.params.id });
+  res.render("edit", { post });
+});
 
-app.post('/update/:id', isLogged, async (req, res)=>{
-    let {content} = req.body
-    let post = await postModel.findOneAndUpdate({_id: req.params.id}, {content: content})
-    res.redirect('/profile')
-})
+app.post("/update/:id", isLogged, async (req, res) => {
+  let { content } = req.body;
+  let post = await postModel.findOneAndUpdate(
+    { _id: req.params.id },
+    { content: content },
+  );
+  res.redirect("/profile");
+});
 
-app.post('/post', isLogged, async (req, res)=>{
-    let user = await userModel.findOne({email: req.user.email})
-    let {content} = req.body;
-    let createdpost = await postModel.create({
-        user: user._id,
-        content
-    })
-    user.posts.push(createdpost._id)
-    await user.save()
-    res.redirect("/profile")
-
-})
-
+app.post("/post", isLogged, async (req, res) => {
+  let user = await userModel.findOne({ email: req.user.email });
+  let { content } = req.body;
+  let createdpost = await postModel.create({
+    user: user._id,
+    content,
+  });
+  user.posts.push(createdpost._id);
+  await user.save();
+  res.redirect("/profile");
+});
 
 // un-protected route
-app.post('/register', async (req, res)=>{
-    let {username, email, password, age, name} = req.body;
-    let userCheck = await userModel.findOne({email})
-    if(userCheck) return res.status(500).send('user already exist')
-    
-    let salt = 10;
-    let hashpassword = await bcrypt.hash(password, salt)
+app.post("/register", async (req, res) => {
+  let { username, email, password, age, name } = req.body;
+  let userCheck = await userModel.findOne({ email });
+  if (userCheck) return res.status(500).send("user already exist");
 
-    let createUser = await userModel.create({
-        name,
-        username,
-        email,
-        password: hashpassword,
-        age
-    })
+  let salt = 10;
+  let hashpassword = await bcrypt.hash(password, salt);
 
+  let createUser = await userModel.create({
+    name,
+    username,
+    email,
+    password: hashpassword,
+    age,
+  });
+
+  //generate token
+  let token = jwt.sign({ email: email, userid: createUser._id }, "secret");
+  res.cookie("token", token); // set cookie on browser
+
+  res.redirect("/profile");
+  // res.send(createUser)
+});
+
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/login");
+});
+
+app.get("/login", (req, res) => {
+  if (req.cookies.token) {
+    try {
+      jwt.verify(req.cookies.token, "secret");
+      return res.redirect("/profile");
+    } catch (err) {
+      res.clearCookie("token");
+    }
+  }
+
+  res.render("login");
+});
+
+app.post("/login-user", async (req, res) => {
+  let { email, password } = req.body;
+  if (!email || !password) {
+    return res.redirect("/login");
+  }
+
+  let find = await userModel.findOne({ email: req.body.email });
+  if (!find) return res.send("something went wrong");
+
+  let bool = await bcrypt.compare(req.body.password, find.password);
+  if (bool) {
     //generate token
-    let token = jwt.sign({email: email, userid: createUser._id}, 'secret')
-    res.cookie('token', token) // set cookie on browser
+    let token = jwt.sign({ email: find.email, userid: find._id }, "secret");
+    res.cookie("token", token); // set cookie on browser
+    // res.status(200).send('login successfully!')
+    res.redirect("/profile");
+  } else {
+    res.send("email or password wrong");
+  }
+});
 
-    res.redirect('/profile')
-    // res.send(createUser)
-})
-
-app.get('/logout', (req, res)=>{
-    res.cookie('token', '')
-    res.redirect('/login')
-})
-
-app.get('/login', (req, res)=>{
-    res.render('login')
-})
-
-app.post('/login-user',async (req, res)=>{
-    let find = await userModel.findOne({email: req.body.email})
-    if(!find) return res.send("something went wrong")
-
-    let bool = await bcrypt.compare(req.body.password, find.password)
-    if(bool){
-        //generate token
-        let token = jwt.sign({email: find.email, userid: find._id}, 'secret') 
-        res.cookie('token', token) // set cookie on browser
-        // res.status(200).send('login successfully!')
-        res.redirect('/profile')
-    } 
-    else{
-        res.send('email or password wrong')
-    } 
-})
-
-Port = 3000
-app.listen(3000, ()=>{
-    console.log(`server is running on ${Port}`)
-})
+Port = 3000;
+app.listen(3000, () => {
+  console.log(`server is running on ${Port}`);
+});
