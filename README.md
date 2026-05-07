@@ -1,6 +1,6 @@
 # 🚀 Backend Development Journey
 
-A structured repository documenting my backend development learning path — from core concepts to a full mini project.
+A structured repository documenting my backend development learning path from core concepts to a full mini project.
 
 ---
 
