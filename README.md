@@ -42,7 +42,7 @@ backend-learning/
 
 A fully functional REST API where different users can sign up, log in, and manage posts.
 
-### Features
+### Main Features
 
 - 🔐 **Auth** — Register & login with JWT stored in httpOnly cookie
 - 📝 **Posts** — Create, read, update, delete posts
